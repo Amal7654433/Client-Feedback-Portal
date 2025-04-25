@@ -2,8 +2,9 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import  { axiosInstance } from "../../config/axios";
-import { signupApi } from "../services/userService";
+import { useDispatch, useSelector } from "react-redux";
+import { signup } from "../redux/slices/authSlice";
+import { toast } from "react-toastify";
 const Signup = () => {
     // Validation Schema using Yup
     const validationSchema = Yup.object({
@@ -23,17 +24,21 @@ const Signup = () => {
     } = useForm({
         resolver: yupResolver(validationSchema)
     });
-
+    const dispatch = useDispatch();
+    const { user, loading, error } = useSelector((state) => state.auth);
     // Submit handler
     const onSubmit = async (data) => {
         try {
-          const result = await signupApi(data); // Wait for signupApi to resolve
-          console.log("Signup successful:", result);
+          await dispatch(signup(data)).unwrap();
+          toast.success("Signup Successful!");
         } catch (error) {
-          console.error("Signup failed:", error); // Handle error here
+          if (error.includes("email")) {
+            toast.error("Email already exists. Please use a different email.");
+          } else {
+            toast.error(error || "Something went wrong. Please try again.");
+          }
         }
       };
-
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900 flex justify-center items-center">
             <div className="max-w-screen-xl m-0 sm:m-10 bg-gray-50 shadow-lg sm:rounded-lg flex w-full">
@@ -118,11 +123,11 @@ const Signup = () => {
                                     )}
                                 </div>
 
-                                <button
+                                <button disabled={loading}
                                     type="submit"
                                     className="mt-5 tracking-wide font-semibold bg-indigo-600 text-white w-full py-3 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center"
                                 >
-                                    <span className="ml-3">Sign Up</span>
+                                    <span className="ml-3"> {loading ? "Signing Up..." : "Sign Up"}</span>
                                 </button>
 
                                 <p className="mt-4 text-xs text-gray-600 text-center">

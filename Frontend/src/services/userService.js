@@ -22,6 +22,14 @@ export const loginApi = async (data) => {
       throw new Error(error.response?.data?.message || error.message);
     }
   };
+  export const logoutApi = async () => {
+    try {
+      const response = await axiosInstance.post("/logout"); // Assuming POST logout
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  };
   export const verifyAuth = async () => {
     const response = await axiosInstance.get("/verify");
     return response.data; // Should be { user: {...} }

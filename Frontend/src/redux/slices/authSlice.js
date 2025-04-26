@@ -1,6 +1,6 @@
 // src/redux/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi, signupApi } from "../../services/userService";
+import { loginApi, logoutApi, signupApi } from "../../services/userService";
 
 export const signup = createAsyncThunk("auth/signup", async (data) => {
   const response = await signupApi(data);
@@ -11,7 +11,10 @@ export const login = createAsyncThunk("auth/login", async (data) => {
   console.log(response,'response from thunk')
   return response;
 });
-
+export const logout = createAsyncThunk("auth/logout", async () => {
+  const response = await logoutApi();
+  return response;
+});
 // Auth slice
 const authSlice = createSlice({
   name: "auth",
@@ -19,18 +22,15 @@ const authSlice = createSlice({
     user: null,
     loading: false,
     error: null,
+    authChecked: false,
   },
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
-      state.loading = false;
       state.error = null;
+      state.authChecked=true
     },
-    logoutUser: (state) => {
-      state.user = null;
-      state.loading = false;
-      state.error = null;
-    },
+
   },
   extraReducers: (builder) => {
     builder
@@ -59,7 +59,20 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
        
+      })
+      .addCase(logout.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.loading = false;
+        state.authChecked=true
+        state.user = null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
+      
   },
 });
 export const { setUser, logoutUser } = authSlice.actions;

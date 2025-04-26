@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "../redux/slices/authSlice";
+import { logout } from "../redux/slices/authSlice";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -118,7 +118,7 @@ export default function Navbar() {
                           <AlertDialogCancel className='bg-indigo-500 text-white'>Cancel</AlertDialogCancel>
                           <AlertDialogAction className='text-white bg-red-400'
                             onClick={() => {
-                              dispatch(logoutUser());
+                              dispatch(logout());
                               navigate("/login");
                             }}
                           >

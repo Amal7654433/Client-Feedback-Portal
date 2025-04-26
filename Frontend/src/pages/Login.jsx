@@ -1,13 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-
-
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../redux/slices/authSlice";
 // Yup validation schema
 const schema = yup.object().shape({
     email: yup.string().email("Invalid email").required("Email is required"),
-    password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+    password: yup.string().min(3, "Password must be at least 6 characters").required("Password is required"),
 });
 
 const Login = () => {
@@ -18,9 +20,18 @@ const Login = () => {
     } = useForm({
         resolver: yupResolver(schema),
     });
-
-    const onSubmit = (data) => {
-        console.log("Form Data:", data);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { user, loading, error } = useSelector((state) => state.auth);
+    const onSubmit = async (data) => {
+        try {
+            const response = await dispatch(login(data)).unwrap();
+            toast.success(response.message || "Login successful!");
+            navigate("/"); 
+        }
+        catch (err) {
+            toast.error(error);
+        }
     };
 
     return (

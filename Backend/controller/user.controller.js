@@ -44,3 +44,7 @@ export const userLogout = asyncHandler(async (req, res) => {
     res.cookie('jwt', '', { maxAge: 0 })
     return res.status(200).json({ message: "User logged out successfully" });
 })
+
+export const checkAuth = asyncHandler(async (req, res) => {
+    res.status(200).json(req.user)
+})

@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../redux/slices/authSlice";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 const Signup = () => {
     // Validation Schema using Yup
     const validationSchema = Yup.object({
@@ -24,20 +25,19 @@ const Signup = () => {
     } = useForm({
         resolver: yupResolver(validationSchema)
     });
+      const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user, loading, error } = useSelector((state) => state.auth);
     // Submit handler
     const onSubmit = async (data) => {
         try {
-          await dispatch(signup(data)).unwrap();
-          toast.success("Signup Successful!");
-        } catch (error) {
-          if (error.includes("email")) {
-            toast.error("Email already exists. Please use a different email.");
-          } else {
-            toast.error(error || "Something went wrong. Please try again.");
+         const response=   await dispatch(signup(data)).unwrap();
+          toast.success(response.message || "Signup successful!");
+          navigate("/"); 
+          } catch (err) {
+            toast.error(error);
           }
-        }
+          
       };
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900 flex justify-center items-center">
